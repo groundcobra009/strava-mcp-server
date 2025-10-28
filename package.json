@@ -1,11 +1,11 @@
 {
-  "name": "@groundcobra009/strava-mcp-server",
+  "name": "@keitaro_aigc/strava-mcp-server",
   "version": "1.0.0",
   "description": "MCP server for Strava API integration",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
-    "strava-mcp-server": "./dist/index.js"
+    "strava-mcp-server": "dist/index.js"
   },
   "files": [
     "dist",
@@ -14,7 +14,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/groundcobra009/strava-mcp-server.git"
+    "url": "git+https://github.com/groundcobra009/strava-mcp-server.git"
   },
   "bugs": {
     "url": "https://github.com/groundcobra009/strava-mcp-server/issues"
