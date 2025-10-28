@@ -4,16 +4,16 @@ Strava APIとMCP（Model Context Protocol）を統合するサーバーです。
 
 ## インストール
 
-### npmからインストール（公開後）
+### npmからインストール
 
 ```bash
-npm install -g @keitaro/strava-mcp-server
+npm install -g @keitaro_aigc/strava-mcp-server
 ```
 
 またはプロジェクトローカルに：
 
 ```bash
-npm install @keitaro/strava-mcp-server
+npm install @keitaro_aigc/strava-mcp-server
 ```
 
 ### ソースからビルド
@@ -89,7 +89,7 @@ Claude Desktopの設定ファイル（`claude_desktop_config.json`）に以下�
   "mcpServers": {
     "strava": {
       "command": "npx",
-      "args": ["-y", "@keitaro/strava-mcp-server"],
+      "args": ["-y", "@keitaro_aigc/strava-mcp-server"],
       "env": {
         "STRAVA_CLIENT_ID": "your_client_id",
         "STRAVA_CLIENT_SECRET": "your_client_secret",
@@ -109,7 +109,7 @@ Claude Desktopの設定ファイル（`claude_desktop_config.json`）に以下�
   "mcpServers": {
     "strava": {
       "command": "npx",
-      "args": ["-y", "@keitaro/strava-mcp-server"],
+      "args": ["-y", "@keitaro_aigc/strava-mcp-server"],
       "env": {
         "STRAVA_CLIENT_ID": "your_client_id",
         "STRAVA_CLIENT_SECRET": "your_client_secret",
