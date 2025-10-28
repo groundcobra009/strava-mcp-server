@@ -4,6 +4,16 @@ Strava APIとMCP（Model Context Protocol）を統合するサーバーです。
 
 このMCPサーバーを使用することで、ClaudeなどのAIアシスタントから直接Stravaのアクティビティデータを取得・分析できます。ランニングやサイクリングの記録を会話形式で確認したり、統計情報を簡単に照会できます。
 
+## 📦 対応クライアント
+
+このMCPサーバーは以下のクライアントで使用できます：
+
+- ✅ **Claude Desktop** - Anthropic公式デスクトップアプリ
+- ✅ **Cursor** - AI統合コードエディタ
+- ✅ **Manus** - AIアシスタントプラットフォーム
+- ✅ **Dify** - ノーコードAIアプリケーションプラットフォーム
+- ⚠️ **ChatGPT（開発モード）** - Custom GPT Actions 経由（HTTPラッパーが必要）
+
 ## インストール
 
 ### npmからインストール
@@ -169,13 +179,209 @@ notepad %APPDATA%\Claude\claude_desktop_config.json
 
 5. 🔨マークで「strava」が利用可能になっていることを確認
 
+### ステップ2-B: Cursor での設定
+
+Cursor エディタで使用する場合：
+
+#### 設定ファイルの場所
+
+- **macOS/Linux**: `~/.cursor/mcp.json`
+- **Windows**: `%APPDATA%\Cursor\User\mcp.json`
+
+#### 設定手順
+
+1. 設定ファイルを作成または編集：
+
+```bash
+# macOS/Linux
+mkdir -p ~/.cursor
+nano ~/.cursor/mcp.json
+
+# Windows
+mkdir %APPDATA%\Cursor\User
+notepad %APPDATA%\Cursor\User\mcp.json
+```
+
+2. 以下の内容を追加：
+
+```json
+{
+  "mcpServers": {
+    "strava": {
+      "command": "npx",
+      "args": ["-y", "@keitaro_aigc/strava-mcp-server"],
+      "env": {
+        "STRAVA_CLIENT_ID": "your_client_id",
+        "STRAVA_CLIENT_SECRET": "your_client_secret",
+        "STRAVA_REFRESH_TOKEN": "your_refresh_token"
+      }
+    }
+  }
+}
+```
+
+3. 各値を実際の認証情報に置き換え
+
+4. Cursor を再起動
+
+5. Cursor の AI チャットで MCP ツールが利用可能になっていることを確認
+
+### ステップ2-C: Manus での設定
+
+Manus で使用する場合：
+
+#### 設定手順
+
+1. Manus の設定画面を開く
+
+2. MCP サーバー設定セクションに移動
+
+3. 新しいサーバーを追加：
+
+```json
+{
+  "name": "strava",
+  "command": "npx",
+  "args": ["-y", "@keitaro_aigc/strava-mcp-server"],
+  "env": {
+    "STRAVA_CLIENT_ID": "your_client_id",
+    "STRAVA_CLIENT_SECRET": "your_client_secret",
+    "STRAVA_REFRESH_TOKEN": "your_refresh_token"
+  }
+}
+```
+
+4. 設定を保存
+
+5. Manus を再起動してツールを有効化
+
+### ステップ2-D: Dify での設定
+
+Dify プラットフォームで使用する場合：
+
+#### セルフホスト版の場合
+
+1. Dify の `docker-compose.yml` に環境変数を追加：
+
+```yaml
+services:
+  api:
+    environment:
+      # 既存の環境変数...
+      STRAVA_CLIENT_ID: "your_client_id"
+      STRAVA_CLIENT_SECRET: "your_client_secret"
+      STRAVA_REFRESH_TOKEN: "your_refresh_token"
+```
+
+2. MCP サーバーをカスタムツールとして登録：
+
+```json
+{
+  "tool_name": "strava_mcp",
+  "command": "npx -y @keitaro_aigc/strava-mcp-server",
+  "type": "mcp"
+}
+```
+
+3. Docker コンテナを再起動：
+
+```bash
+docker-compose down
+docker-compose up -d
+```
+
+#### クラウド版の場合
+
+1. Dify のワークスペース設定を開く
+
+2. 「カスタムツール」セクションに移動
+
+3. 新しい MCP ツールを追加し、エンドポイント情報を設定
+
+**注意**: クラウド版では MCP サーバーを別途ホスティングする必要がある場合があります。
+
+### ステップ2-E: ChatGPT（開発モード）での設定
+
+ChatGPT の開発モード（Actions/Functions）で使用する場合：
+
+#### 前提条件
+
+- ChatGPT Plus または Enterprise アカウント
+- カスタム GPT の作成権限
+
+#### 設定手順
+
+1. ChatGPT で「GPTs」→「Create a GPT」を選択
+
+2. 「Configure」タブで Actions を追加
+
+3. MCP サーバーを API エンドポイントとしてホスティング（例：Vercel、AWS Lambda など）
+
+4. OpenAPI スキーマを定義：
+
+```yaml
+openapi: 3.0.0
+info:
+  title: Strava MCP Server
+  version: 1.0.0
+servers:
+  - url: https://your-deployment-url.com
+paths:
+  /get_activities:
+    post:
+      summary: Get athlete activities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                page:
+                  type: integer
+                per_page:
+                  type: integer
+      responses:
+        '200':
+          description: Success
+  /get_activity:
+    post:
+      summary: Get specific activity
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                activity_id:
+                  type: integer
+              required:
+                - activity_id
+      responses:
+        '200':
+          description: Success
+```
+
+5. 環境変数を Actions の設定で追加
+
+**注意**: ChatGPT での使用には MCP サーバーの HTTP ラッパーが必要です。直接的な STDIO 接続はサポートされていません。
+
 ### ステップ3: 動作確認
 
-Claude Desktopで以下のように質問してみてください：
+各クライアントで以下のように質問してみてください：
+
+#### Claude Desktop / Cursor / Manus
 
 ```
 最近のアクティビティを5件教えて
 ```
+
+#### Dify
+
+ワークフロー内で Strava MCP ツールを呼び出し、パラメータを指定して実行。
+
+#### ChatGPT
+
+カスタム GPT 内でアクションが利用可能になっていることを確認。
 
 Stravaのデータが表示されれば、セットアップ完了です！🎉
 
